@@ -1,0 +1,12 @@
+[[redirects]]
+from = "/*"
+to = "index.html"
+status = 200
+
+
+#The build command and publish properties are critical to deploy in NETLIFY
+#To avoid the error "'vite' is not recognized as an internal or external command, operable program or batch file"
+[build]
+  command = "npm run build"
+  publish = "dist"
+
