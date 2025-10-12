@@ -43,7 +43,7 @@ export default {
     };
   },
   created() {
-    this.getServices(this.formData.businessId);
+    //this.getServices(this.formData.businessId);
     this.getEmployees();
   },
   methods: {
@@ -108,6 +108,8 @@ export default {
       }
     },
     async fetchBusinessDetails() {
+      console.log("Current mode:", import.meta.env.MODE);
+      console.log("Base URL:", import.meta.env.VITE_API_BASE_URL);
       try {
         const token = sessionStorage.getItem("jwt");
         const VITE_API_KEY = import.meta.env.VITE_API_KEY;

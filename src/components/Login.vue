@@ -54,7 +54,7 @@ import httpClient from "../util/axiosClient";
 export default {
   data() {
     return {
-      isPrd: true,
+      isPrd: false,
       email: '',
       password: '',
       loginUrl: '/Account/login',
@@ -62,14 +62,10 @@ export default {
   },
   methods: {
       async loginWithProvider(provider) {
-        const baseUrl = this.isPrd
-          ? "https://enrollpro-ctdeb9a9a9c8b8ez.canadacentral-01.azurewebsites.net"
-          : "https://localhost:7041";
-
+        const baseUrl = import.meta.env.VITE_API_BASE_URL;
         const redirectUrl = `${baseUrl}/login/${provider}`;
         window.location.href = redirectUrl;
       },
-
       async handleLogin() {
         this.errorMessage = "";
         this.successMessage = "";
