@@ -10,7 +10,7 @@ export default {
 
     if (token) {
       sessionStorage.setItem("jwt", token);
-      this.$router.push("/Admin");
+      this.$router.push("/");
     } else {
       this.$router.push("/login");
     }

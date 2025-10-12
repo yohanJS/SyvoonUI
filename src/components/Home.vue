@@ -1,5 +1,5 @@
 <script>
-import axiosClient from "../util/axiosClient"; // adjust path if needed
+import axiosClient from "../util/axiosClient";
 
 export default {
   name: "HomePage",
@@ -8,17 +8,17 @@ export default {
       zipCode: null,
       error: null,
       businessDetails: [],
+      loading: false,
     };
-  },
-  mounted() {
-    // this.getUserLocation();
   },
   methods: {
     formatDate(dateStr) {
-        const date = new Date(dateStr);
-        return date.toLocaleDateString() + " " + date.toLocaleTimeString();
+      const date = new Date(dateStr);
+      return date.toLocaleDateString() + " " + date.toLocaleTimeString();
     },
     async testEnrollProAPI() {
+      this.loading = true;
+      this.error = null;
       try {
         const token = sessionStorage.getItem("jwt");
         const apiKey = import.meta.env.VITE_API_KEY;
@@ -31,53 +31,11 @@ export default {
         });
 
         this.businessDetails = res.data;
-        console.log("EnrollPro response:", this.businessDetails);
       } catch (err) {
         this.error = "Failed to connect to EnrollPro API. " + err.message;
-        console.error("EnrollPro error:", err);
         this.showModal();
-      }
-    },
-
-    getUserLocation() {
-      if ("geolocation" in navigator) {
-        navigator.geolocation.getCurrentPosition(
-          (position) => {
-            const lat = position.coords.latitude;
-            const lon = position.coords.longitude;
-            this.reverseGeocode(lat, lon);
-          },
-          (err) => {
-            this.error = "Location permission denied or unavailable.";
-            console.error("Geolocation error:", err.message);
-            this.showModal();
-          }
-        );
-      } else {
-        this.error = "Geolocation is not supported in this browser.";
-        this.showModal();
-      }
-    },
-
-    async reverseGeocode(lat, lon) {
-      const apiKey = "e8319ff489074ad5bd84e3797767a4a0";
-      const url = `https://api.geoapify.com/v1/geocode/reverse?lat=${lat}&lon=${lon}&apiKey=${apiKey}`;
-
-      try {
-        const response = await fetch(url);
-        const data = await response.json();
-        const result = data.features?.[0];
-
-        if (result?.properties?.postcode) {
-          this.zipCode = result.properties.postcode;
-        } else {
-          this.error = "Could not retrieve ZIP code from location.";
-        }
-      } catch (err) {
-        console.error("Geoapify error:", err);
-        this.error = "Failed to connect to address service.";
       } finally {
-        this.showModal();
+        this.loading = false;
       }
     },
     showModal() {
@@ -89,33 +47,63 @@ export default {
 </script>
 
 <template>
-  <div class="container mx-auto py-3 p-0 rounded-4 m-0 mt-5">
-    <h2>Home Page</h2>
-    <button class="btn btn-primary" @click="testEnrollProAPI">
-      Test EnrollPro API
-    </button>
+  <div class="container mx-auto px-4 py-5">
+    <div class="text-center mb-5">
+      <h1 class="fw-bold mb-2 text-primary">Welcome to EnrollPro</h1>
+      <p class="text-muted">Quickly test your API connection and view your registered businesses.</p>
+    </div>
 
-    <div v-if="businessDetails.length" class="mt-3">
-      <h5>Business Details:</h5>
-      <ul>
-        <li v-for="(biz, index) in businessDetails" :key="index">
-          {{ biz.name }} - {{ biz.id }}
-        </li>
-      </ul>
+    <div class="card shadow-sm border-0 rounded-4 p-4 text-center bg-light">
+      <button
+        class="btn btn-primary btn-lg px-4 py-2 fw-semibold"
+        @click="testEnrollProAPI"
+        :disabled="loading"
+      >
+        <span v-if="!loading">🚀 Test EnrollPro API</span>
+        <span v-else>
+          <span class="spinner-border spinner-border-sm me-2"></span> Loading...
+        </span>
+      </button>
+
+      <div v-if="businessDetails.length" class="mt-5">
+        <h5 class="fw-bold text-secondary mb-3">Business Details</h5>
+        <div class="table-responsive">
+          <table class="table table-hover align-middle">
+            <thead class="table-light">
+              <tr>
+                <th scope="col">#</th>
+                <th scope="col">Business Name</th>
+                <th scope="col">ID</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr v-for="(biz, index) in businessDetails" :key="index">
+                <td>{{ index + 1 }}</td>
+                <td class="fw-semibold">{{ biz.name }}</td>
+                <td><span class="badge bg-primary">{{ biz.id }}</span></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div v-else-if="!loading" class="text-muted mt-4">
+        No businesses loaded yet. Click the button above to test your connection.
+      </div>
     </div>
 
     <!-- Modal -->
     <div class="modal fade" id="geolocationModal" tabindex="-1" aria-hidden="true">
-      <div class="modal-dialog">
-        <div class="modal-content">
-          <div class="modal-header">
-            <h5 class="modal-title">Notice</h5>
-            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow-lg rounded-4">
+          <div class="modal-header bg-danger text-white">
+            <h5 class="modal-title fw-semibold">Error</h5>
+            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
           </div>
           <div class="modal-body">
-            <p>{{ error }}</p>
+            <p class="m-0">{{ error }}</p>
           </div>
-          <div class="modal-footer">
+          <div class="modal-footer bg-light">
             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
           </div>
         </div>
@@ -125,24 +113,37 @@ export default {
 </template>
 
 <style scoped>
-.modal-content {
-  border-radius: 10px;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+.card {
+  backdrop-filter: blur(8px);
 }
 
-.modal-header,
-.modal-footer {
-  background-color: #f8f9fa;
-  border-color: #dee2e6;
+.btn-primary {
+  background: linear-gradient(135deg, #007bff, #4e73df);
+  border: none;
+  transition: all 0.2s ease;
+}
+
+.btn-primary:hover {
+  background: linear-gradient(135deg, #0056d2, #375ac3);
+  transform: translateY(-1px);
+}
+
+.table-hover tbody tr:hover {
+  background-color: #f8f9fc;
+  cursor: pointer;
+}
+
+.modal-content {
+  border-radius: 15px;
 }
 
 @media (max-width: 576px) {
-  .welcome-txt {
-    font-size: 1rem;
+  h1 {
+    font-size: 1.6rem;
   }
 
-  .welcome-txt-under {
-    font-size: 1.2rem;
+  .btn-lg {
+    font-size: 1rem;
   }
 }
 </style>
