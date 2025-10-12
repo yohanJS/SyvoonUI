@@ -54,7 +54,7 @@ import httpClient from "../util/axiosClient";
 export default {
   data() {
     return {
-      isPrd: false,
+      isPrd: true,
       email: '',
       password: '',
       loginUrl: '/Account/login',
