@@ -24,7 +24,7 @@
           <RouterLink to="/Register" class="nav-link text-primary text-decoration-underline">Register now</RouterLink>
           <p class="mt-2 mb-2">Or</p>
           <!-- filepath: d:\Repos\SyvoonUI\src\components\Login.vue -->
-          <a class="google-login-btn d-flex align-items-center justify-content-center mt-2" @click="loginWithGoogle">
+          <a class="google-login-btn d-flex align-items-center justify-content-center mt-2" @click="loginWithProvider('google')">
             <i class="bi bi-google me-2 google-icon"></i>
             <span>Login with Google</span>
           </a>
@@ -54,52 +54,47 @@ import httpClient from "../util/axiosClient";
 export default {
   data() {
     return {
-      isPrd: true,
+      isPrd: false,
       email: '',
       password: '',
       loginUrl: '/Account/login',
     };
   },
   methods: {
-    async loginWithGoogle() {
-      // Redirect user to the .NET backend login endpoint
-      window.location.href = this.isPrd ? "https://engfuel.com/Account/login-google" : "https://localhost:7091/Account/login-google";
-    },
-    async loginWithFacebook() {
-      // Redirect user to the .NET backend login endpoint
-      window.location.href = this.isPrd ? "https://engfuel.com/Account/login-facebook" : "https://localhost:7091/Account/login-facebook";
-    },
-    async loginWithMicrosoft() {
-      // Redirect user to the .NET backend login endpoint
-      window.location.href = this.isPrd ? "https://engfuel.com/Account/login-microsoft" : "https://localhost:7091/Account/login-microsoft";
-    },
-    async handleLogin() {
-      this.errorMessage = "";
-      this.successMessage = "";
-      const payload = {
-        email: this.email,
-        password: this.password,
-      };
-      this.isLoading = true;
-      try {
-        const response = await httpClient.post(this.loginUrl, payload);
+      async loginWithProvider(provider) {
+        const baseUrl = this.isPrd
+          ? "https://enrollpro-ctdeb9a9a9c8b8ez.canadacentral-01.azurewebsites.net"
+          : "https://localhost:7041";
 
-        const token = response.data.token;
-        if (token) {
-          sessionStorage.setItem("jwt", token); // Or use cookies
+        const redirectUrl = `${baseUrl}/login/${provider}`;
+        window.location.href = redirectUrl;
+      },
 
-          this.successMessage = "Login successful!";
-          this.$router.push("/dashboard"); // or another protected route
-        } else {
-          this.errorMessage = "Invalid login response.";
+      async handleLogin() {
+        this.errorMessage = "";
+        this.successMessage = "";
+        const payload = {
+          email: this.email,
+          password: this.password,
+        };
+        this.isLoading = true;
+        try {
+          const response = await httpClient.post(this.loginUrl, payload);
+          const token = response.data.token;
+          if (token) {
+            sessionStorage.setItem("jwt", token);
+            this.successMessage = "Login successful!";
+            this.$router.push("/dashboard");
+          } else {
+            this.errorMessage = "Invalid login response.";
+          }
+        } catch (error) {
+          this.errorMessage = error.response?.data?.message || "Login failed.";
+        } finally {
+          this.isLoading = false;
         }
-      } catch (error) {
-        this.errorMessage = error.response?.data?.message || "Login failed.";
-      } finally {
-        this.isLoading = false;
       }
-    },
-  },
+    }
 };
 </script>
 

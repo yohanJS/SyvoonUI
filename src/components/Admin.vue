@@ -107,6 +107,22 @@ export default {
         alert("Error fetching services:", error);
       }
     },
+    async fetchBusinessDetails() {
+      try {
+        const token = sessionStorage.getItem("jwt");
+        const VITE_API_KEY = import.meta.env.VITE_API_KEY;
+        const res = await httpClient.get("/business/getAllBusinesses", {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            'x-api-key': VITE_API_KEY
+          }
+        });
+
+        this.businessDetails = res.data; // Store API response
+      } catch (error) {
+        console.error("Error fetching business details:", error);
+      }
+    },
     async onFileChange(event) {
       if (this.isEditServiceModalOpen) {
         this.editService.file = event.target.files[0]; // Store selected file
@@ -262,6 +278,10 @@ export default {
         <!-- Step 1: Add Services -->
         <div v-if="step === 1">
           <div class="p-0">
+            <!-- Add this inside your <template> -->
+            <button @click="fetchBusinessDetails" class="btn btn-primary">
+              Test Business API Call
+            </button>
             <!-- Add Service Buttons Section -->
             <div class="col-12 text-end">
               <i v-if="!isFormOpen" @click="toggleForm" class="btn-add text-white" style="cursor: pointer;">
