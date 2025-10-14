@@ -61,9 +61,16 @@ export default {
     };
   },
   methods: {
-      async loginWithProvider(provider) {
+      async loginWithProvider(provider, businessId) {
+        const clientUrl = window.location.origin;
         const baseUrl = import.meta.env.VITE_API_BASE_URL;
-        const redirectUrl = `${baseUrl}/login/${provider}`;
+
+        const queryParams = new URLSearchParams({
+          returnUrl: clientUrl,
+          businessId: businessId || ''
+        });
+
+        const redirectUrl = `${baseUrl}/login/${provider}?${queryParams.toString()}`;
         window.location.href = redirectUrl;
       },
       async handleLogin() {
