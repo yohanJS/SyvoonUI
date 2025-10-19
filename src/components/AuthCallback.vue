@@ -3,6 +3,7 @@
 </template>
 
 <script>
+import { authState } from "../stores/auth";
 import axiosClient from "../util/axiosClient";
 
 export default {
@@ -16,12 +17,12 @@ export default {
         },
       });
 
-      // If it succeeds (JWT cookie is valid)
       if (res.status === 200) {
-        console.log("User authenticated:", res.data);
-        this.$router.push("/"); // Go to home
+        authState.isAuthenticated = true;
+        authState.user = res.data;
+        this.$router.push("/");
       } else {
-        this.$router.push("/login"); // Not logged in
+        this.$router.push("/login");
       }
     } catch (err) {
       console.warn("Not authenticated or token expired:", err);

@@ -1,12 +1,16 @@
 <script>
-import { useRouter } from 'vue-router';
+import authState from '../stores/auth';
 
 export default {
   data() {
     return {
       isOpen: false,
-      isLoggedIn: "false",
     };
+  },
+  computed: {
+    isLoggedIn() {
+      return authState.isAuthenticated;
+    },
   },
   methods: {
     toggleMenu() {
@@ -16,19 +20,13 @@ export default {
       this.isOpen = false;
     },
     logout() {
-        sessionStorage.removeItem("jwt");
-        this.isLoggedIn = false;
-        this.$router.push({ path: '/Login' });
+      // Optional: call logout endpoint to clear cookie
+      authState.isAuthenticated = false;
+      this.$router.push("/login");
     },
   },
   created() {
-    const router = useRouter();
-    router.afterEach(() => {
-      this.closeMenu();
-      // Update isLoggedIn on route change
-      this.isLoggedIn = !!sessionStorage.getItem("jwt");
-    });
-    this.isLoggedIn = !!sessionStorage.getItem("jwt");
+    // Optional: perform a silent auth check here too
   },
 };
 </script>
