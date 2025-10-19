@@ -68,50 +68,39 @@ export default {
                 </span>
             </button>
 
-            <div v-if="businessDetails.length" class="mt-5">
-                <h5 class="fw-bold text-secondary mb-3">Business Details</h5>
-                <div class="table-responsive">
-                    <table class="table table-hover align-middle">
-                        <thead class="table-light">
-                            <tr>
-                                <th scope="col">#</th>
-                                <th scope="col">Business Name</th>
-                                <th scope="col">ID</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <template v-for="(biz, index) in businessDetails" :key="index">
-                                <tr>
-                                    <td>{{ index + 1 }}</td>
-                                    <td class="fw-semibold">{{ biz.name }}</td>
-                                    <td>
-                                        <span class="badge bg-primary">{{ biz.id }}</span>
-                                        <button class="btn btn-sm btn-outline-secondary ms-2"
-                                            @click="toggleDetails(index)">
-                                            {{ detailsVisible[index] ? "Hide" : "Show" }} Details
-                                        </button>
-                                    </td>
-                                </tr>
-                                <tr v-if="detailsVisible[index]">
-                                    <td colspan="3">
-                                        <div class="text-start ms-3">
-                                            <p><strong>Address:</strong> {{ biz.address }}</p>
-                                            <p><strong>Email:</strong> {{ biz.email }}</p>
-                                            <p><strong>Phone:</strong> {{ biz.phone }}</p>
-                                            <p><strong>Website:</strong> <a :href="biz.websiteUrl" target="_blank">{{
-                                                    biz.websiteUrl }}</a></p>
-                                            <p><strong>Category:</strong> {{ biz.category }}</p>
-                                            <p><strong>Description:</strong> {{ biz.description }}</p>
-                                            <p><strong>Created:</strong> {{ formatDate(biz.createdAt) }}</p>
-                                            <p><strong>Updated:</strong> {{ formatDate(biz.lastUpdatedAt) }}</p>
-                                        </div>
-                                    </td>
-                                </tr>
-                            </template>
-                        </tbody>
-                    </table>
-                </div>
+<div v-if="businessDetails.length" class="mt-5">
+  <h5 class="fw-bold text-secondary mb-4">Business Directory</h5>
+  <div class="row g-4">
+    <div class="col-md-6 col-lg-4" v-for="(biz, index) in businessDetails" :key="index">
+      <div class="card h-100 shadow-sm border-0 rounded-4">
+        <div class="card-body">
+          <h5 class="card-title text-primary d-flex justify-content-between align-items-center">
+            {{ biz.name }}
+            <span class="badge bg-gradient bg-primary">{{ biz.id }}</span>
+          </h5>
+          <p class="text-muted small mb-2">{{ biz.category }}</p>
+          <p class="mb-2"><i class="bi bi-geo-alt-fill me-2 text-secondary"></i>{{ biz.address }}</p>
+          <p class="mb-2"><i class="bi bi-envelope-fill me-2 text-secondary"></i>{{ biz.email }}</p>
+          <p class="mb-2"><i class="bi bi-telephone-fill me-2 text-secondary"></i>{{ biz.phone }}</p>
+          <p class="mb-2">
+            <i class="bi bi-globe2 me-2 text-secondary"></i>
+            <a :href="biz.websiteUrl" target="_blank">{{ biz.websiteUrl }}</a>
+          </p>
+          <button class="btn btn-sm btn-outline-primary mt-3" @click="toggleDetails(index)">
+            {{ detailsVisible[index] ? "Hide" : "Show" }} More
+          </button>
+          <transition name="fade">
+            <div v-if="detailsVisible[index]" class="mt-3">
+              <p><strong>Description:</strong> {{ biz.description }}</p>
+              <p><strong>Created:</strong> {{ formatDate(biz.createdAt) }}</p>
+              <p><strong>Updated:</strong> {{ formatDate(biz.lastUpdatedAt) }}</p>
             </div>
+          </transition>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
 
             <div v-else-if="!loading" class="text-muted mt-4">
                 No businesses loaded yet. Click the button above to test your connection.
@@ -140,6 +129,12 @@ export default {
 </template>
 
 <style scoped>
+.fade-enter-active, .fade-leave-active {
+  transition: opacity 0.3s ease;
+}
+.fade-enter-from, .fade-leave-to {
+  opacity: 0;
+}
 .card {
     backdrop-filter: blur(8px);
 }
