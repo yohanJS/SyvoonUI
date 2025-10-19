@@ -3,7 +3,7 @@
 </template>
 
 <script>
-import { authState } from "../stores/auth";
+import authState from "../stores/auth";
 import axiosClient from "../util/axiosClient";
 
 export default {
