@@ -1,15 +1,11 @@
 <script>
-
+import { useRouter } from 'vue-router';
 export default {
     data() {
         return {
             isOpen: false,
+            isLoggedIn: "false",
         };
-    },
-    computed: {
-        isLoggedIn() {
-            return authState.isAuthenticated;
-        },
     },
     methods: {
         toggleMenu() {
