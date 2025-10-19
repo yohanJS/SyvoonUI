@@ -15,6 +15,7 @@ export default {
         headers: {
           "x-api-key": apiKey,
         },
+        credentials: "include",
         withCredentials: true, // ✅ This is critical for sending cookies
       });
 
