@@ -18,20 +18,26 @@ export default {
         return;
       }
 
-      // Step 1: Exchange token and set cookie
-      await axiosClient.post("auth/exchange", { email }, {
+      // Step 1: Exchange token and receive JWT
+      const exchangeRes = await axiosClient.post("auth/exchange", { email }, {
         headers: {
           "x-api-key": apiKey,
-        },
-        withCredentials: true, // ✅ Required for cookie transmission
+        }
       });
 
-      // Step 2: Verify authentication
+      const token = exchangeRes.data?.token;
+      if (!token) {
+        console.warn("No token returned from exchange.");
+        this.$router.push("/login");
+        return;
+      }
+
+      // Step 2: Use token in Authorization header to verify authentication
       const res = await axiosClient.get("auth/me", {
         headers: {
           "x-api-key": apiKey,
-        },
-        withCredentials: true,
+          Authorization: `Bearer ${token}`
+        }
       });
 
       if (res.status === 200) {
