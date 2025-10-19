@@ -15,6 +15,7 @@ export default {
         headers: {
           "x-api-key": apiKey,
         },
+        withCredentials: true, // ✅ This is critical for sending cookies
       });
 
       if (res.status === 200) {
