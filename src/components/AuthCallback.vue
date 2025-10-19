@@ -23,6 +23,7 @@ export default {
         headers: {
           "x-api-key": apiKey,
         },
+        withCredentials: true, // ✅ Required for cookie transmission
       });
 
       // Step 2: Verify authentication
@@ -30,6 +31,7 @@ export default {
         headers: {
           "x-api-key": apiKey,
         },
+        withCredentials: true,
       });
 
       if (res.status === 200) {
