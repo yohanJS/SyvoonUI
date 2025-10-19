@@ -1,33 +1,38 @@
 <script>
-import authState from '../stores/auth';
 
 export default {
-  data() {
-    return {
-      isOpen: false,
-    };
-  },
-  computed: {
-    isLoggedIn() {
-      return authState.isAuthenticated;
+    data() {
+        return {
+            isOpen: false,
+        };
     },
-  },
-  methods: {
-    toggleMenu() {
-      this.isOpen = !this.isOpen;
+    computed: {
+        isLoggedIn() {
+            return authState.isAuthenticated;
+        },
     },
-    closeMenu() {
-      this.isOpen = false;
+    methods: {
+        toggleMenu() {
+            this.isOpen = !this.isOpen;
+        },
+        closeMenu() {
+            this.isOpen = false;
+        },
+        logout() {
+            sessionStorage.removeItem("jwt");
+            this.isLoggedIn = false;
+            this.$router.push({ path: '/Login' });
+        },
     },
-    logout() {
-      // Optional: call logout endpoint to clear cookie
-      authState.isAuthenticated = false;
-      this.$router.push("/login");
+    created() {
+        const router = useRouter();
+        router.afterEach(() => {
+            this.closeMenu();
+            // Update isLoggedIn on route change
+            this.isLoggedIn = !!sessionStorage.getItem("jwt");
+        });
+        this.isLoggedIn = !!sessionStorage.getItem("jwt");
     },
-  },
-  created() {
-    // Optional: perform a silent auth check here too
-  },
 };
 </script>
 
@@ -116,11 +121,13 @@ export default {
         color: #ffffff !important;
     }
 }
+
 .business-link {
     color: #f53434 !important;
     border-radius: 5px;
     box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.1);
 }
+
 .brand {
     font-size: 1.1rem;
     text-decoration: none;
